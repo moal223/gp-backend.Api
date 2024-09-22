@@ -215,7 +215,7 @@ namespace gp_backend.Api.Controllers
         {
             using(var client = new HttpClient())
             {
-                client.BaseAddress = new Uri("https://ml-deploy-production.up.railway.app");
+                client.BaseAddress = new Uri("https://ml-deploy-production-81d4.up.railway.app");
                 using(var content = new MultipartFormDataContent())
                 {
                     var fileStream = file.OpenReadStream();
