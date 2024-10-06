@@ -16,7 +16,7 @@ using gp_backend.EF.MySql.Data;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddSignalR();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -66,6 +66,7 @@ builder.Services.AddScoped<IGenericRepo<Wound>, WoundRepo>();
 builder.Services.AddScoped<IGenericRepo<Disease>, DiseaseRepo>();
 builder.Services.AddScoped<IFeedBackRepo, FeedBackRepo>();
 builder.Services.AddScoped<ISpecialRepo, SpecialRepo>();
+builder.Services.AddScoped<IMessageRepo, MessageRepo>();
 builder.Services.AddLogging();
 
 builder.Services.AddCors(options =>

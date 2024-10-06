@@ -28,5 +28,7 @@ namespace gp_backend.EF.MySql.Data
         public virtual DbSet<Wound> Wounds { get; set; }
         public virtual DbSet<FeedBack> FeedBacks { get; set; }
         public virtual DbSet<Specialization> Specializations { get; set; }
+        public virtual DbSet<Message> Messages { get; set; }
+
     }
 }
