@@ -58,10 +58,7 @@ namespace gp_backend.Api.Controllers
 
                 var wound = new Wound
                 {
-                    Type = "Type",
-                    Location = "Location",
                     UploadDate = DateTime.Now.Date,
-                    Advice = "Advice",
                     User = user,
                     ApplicationUserId = user.Id,
                     Image = fileDescription
@@ -96,8 +93,6 @@ namespace gp_backend.Api.Controllers
                 return Ok(new BaseResponse(true, new List<string> { "Uploaded Successfuly" }, new GetWoundDetailsDto
                 {
                     Id = wound.Id,
-                    Type = wound.Type,
-                    Location = "Location",
                     Name = diseaseName,
                     Description = description,
                     Image = Convert.ToBase64String(fileDescription.Content.Content),
@@ -128,7 +123,6 @@ namespace gp_backend.Api.Controllers
                 {
                     Id = wound.Id,
                     file = Convert.ToBase64String( wound?.Image?.Content?.Content),
-                    Type = wound.Type,
                     Name = name,
                     AddedDate = wound.UploadDate.ToShortDateString(),
                 });
@@ -173,9 +167,7 @@ namespace gp_backend.Api.Controllers
                         Id = result.Id,
                         Description = description,
                         Name = diseaseName,
-                        Location = result.Location,
                         Preventions = prevention,
-                        Type = result.Type,
                         UploadDate = result.UploadDate,
                         Image = Convert.ToBase64String(result?.Image?.Content?.Content),
                         Risk = risk
