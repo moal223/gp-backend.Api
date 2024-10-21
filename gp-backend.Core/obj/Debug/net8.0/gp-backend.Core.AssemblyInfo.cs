@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("gp-backend.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8563337cf7018d5b506ec9c1f16bb54d2b8a29bd")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6c3469bc857b2f5999511fd8257fa8694fb10ce9")]
 [assembly: System.Reflection.AssemblyProductAttribute("gp-backend.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("gp-backend.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
