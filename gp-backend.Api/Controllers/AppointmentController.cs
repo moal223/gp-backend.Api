@@ -72,7 +72,7 @@ namespace gp_backend.Api.Controllers
                     DoctorName = appointment.Doctor.FullName
                 }) ;
             }
-            return Ok(new BaseResponse(true, ["Sucess"], ));
+            return Ok(new BaseResponse(true, ["Sucess"], appointmentsDto));
         }
     }
 }
