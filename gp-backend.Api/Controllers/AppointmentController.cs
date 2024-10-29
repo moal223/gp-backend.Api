@@ -40,7 +40,7 @@ namespace gp_backend.Api.Controllers
 
             var appointment = await _appointmentRepo.Insert(new Core.Models.Appointment
             {
-                AppointmentDate = model.AppointmentDate,
+                AppointmentDate = DateTime.Parse(model.AppointmentDate),
                 Doctor = doctor,
                 Patient = patient
             });
