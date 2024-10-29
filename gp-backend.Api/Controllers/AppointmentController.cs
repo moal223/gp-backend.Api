@@ -52,5 +52,27 @@ namespace gp_backend.Api.Controllers
                 DoctorId = doctor.Id
             }));
         }
+
+
+        [HttpGet]
+        public async Task<IActionResult> GetAll([FromRoute]string doctorId)
+        {
+            if (doctorId == string.Empty)
+                return BadRequest();
+
+            var appointments = (await _appointmentRepo.GetAll(doctorId)).ToList();
+            List<GetAppointmentDetails> appointmentsDto = [];
+            foreach (var appointment in appointments)
+            {
+                appointmentsDto.Add(new GetAppointmentDetails
+                {
+                    Id = appointment.Id,
+                    AppointmentDate = appointment.AppointmentDate,
+                    DoctorId = appointment.Doctor.Id,
+                    DoctorName = appointment.Doctor.FullName
+                }) ;
+            }
+            return Ok(new BaseResponse(true, ["Sucess"], ));
+        }
     }
 }
