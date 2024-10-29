@@ -55,7 +55,7 @@ namespace gp_backend.Api.Controllers
 
 
         [HttpGet]
-        public async Task<IActionResult> GetAll([FromRoute]string doctorId)
+        public async Task<IActionResult> GetAll([FromQuery]string doctorId)
         {
             if (doctorId == string.Empty)
                 return BadRequest();
