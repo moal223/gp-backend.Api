@@ -23,8 +23,11 @@ namespace gp_backend.EF.MySql.Repositories
         {
             if (appointment == null)
                 return null;
-            var x =  await _context.Appointments.AddAsync(appointment);
-            return x.Entity;
+            await _context.Appointments.AddAsync(appointment);
+
+            await _context.SaveChangesAsync();
+
+            return appointment;
         }
     }
 }
