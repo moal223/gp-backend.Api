@@ -68,6 +68,7 @@ builder.Services.AddScoped<IGenericRepo<Disease>, DiseaseRepo>();
 builder.Services.AddScoped<IFeedBackRepo, FeedBackRepo>();
 builder.Services.AddScoped<ISpecialRepo, SpecialRepo>();
 builder.Services.AddScoped<IMessageRepo, MessageRepo>();
+builder.Services.AddScoped<IAppointmentRepo, AppointmentRepo>();
 builder.Services.AddLogging();
 
 builder.Services.AddCors(options =>
