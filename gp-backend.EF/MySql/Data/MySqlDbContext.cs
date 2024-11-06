@@ -1,5 +1,6 @@
 ﻿using gp_backend.Core.Models;
 using gp_backend.EF.MySql.Data.Configurations;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
