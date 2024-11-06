@@ -23,4 +23,6 @@ RUN dotnet publish "gp-backend.Api.csproj" -c $BUILD_CONFIGURATION -o /app/publi
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+# Add environment variable for ASP.NET Core to listen on the correct port
+ENV ASPNETCORE_URLS=http://*:8080
 ENTRYPOINT ["dotnet", "gp-backend.Api.dll"]
