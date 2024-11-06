@@ -18,7 +18,7 @@ services:
     image: mysql:latest
     environment:
       MYSQL_ROOT_PASSWORD: mypassword
-      MYSQL_DATABASE=railway
+      MYSQL_DATABASE=skindb
       MYSQL_USER=root
       MYSQL_PASSWORD=mypassword
     ports:
