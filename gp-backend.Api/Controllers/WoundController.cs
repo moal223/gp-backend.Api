@@ -41,15 +41,12 @@ namespace gp_backend.Api.Controllers
                 }
 
                 // extract the file description
-                var response = await CallFlaskEndPoint(file);
-                if (response == null)
-                    return BadRequest();
-                Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains( response[0]));
-                Disease diseasse_skin = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains( response[1]));
+                //var response = await CallFlaskEndPoint(file);
+                //if (response == null)
+                //    return BadRequest();
+                //Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains( response[0]));
+                Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains( "disease"));
 
-
-                if (diseasse == null && diseasse_skin == null)
-                    return Ok(new BaseResponse(true, new List<string> { "Your Health is good"}, null));
 
                 var fileDescription = GetDescription(file);
                 var uid = User.Claims.FirstOrDefault(x => x.Type == "uid").Value;
@@ -67,7 +64,7 @@ namespace gp_backend.Api.Controllers
                 string description = "";
                 string risk = "";
                 var prevention = new List<string>();
-                if(diseasse is not null)
+                if (diseasse is not null)
                 {
                     wound.Disease.Add(diseasse);
                     diseaseName += diseasse.Name;
@@ -76,15 +73,13 @@ namespace gp_backend.Api.Controllers
                     prevention.AddRange(diseasse.Preventions);
                     risk += diseasse.Risk;
                 }
-                if (diseasse_skin is not null)
-                {
-                    wound.Disease.Add(diseasse_skin);
-                    diseaseName += " / " + diseasse_skin.Name;
-                    description += $"{diseasse_skin.Name}: \n\n";
-                    description += diseasse_skin.Description;
-                    prevention.AddRange(diseasse_skin.Preventions);
-                    risk += "\n\n" + diseasse_skin.Risk;
-                }
+
+                wound.Disease.Add(diseasse);
+                    diseaseName += diseasse.Name;
+                    description += $"{diseaseName}: \n\n";
+                    description += diseasse.Description + "\n\n";
+                    prevention.AddRange(diseasse.Preventions);
+                    risk += diseasse.Risk;
 
                 
                 var result = await _woundRepo.InsertAsync(wound);
