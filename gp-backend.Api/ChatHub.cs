@@ -39,73 +39,37 @@ namespace gp_backend.Api
             return base.OnDisconnectedAsync(exception);
         }
         [HubMethodName("sendMessage")]
-        public async Task SendMessage(string senderId, string recipientId, string message)
+        public async Task SendMessage(SendFileDto message)
         {
             var msg = new Message
             {
-                SenderId = senderId,
-                RecipientId = recipientId,
-                Content = message,
+                SenderId = message.SenderId,
+                RecipientId = message.RecipientId,
+                Content = message.Content,
+                Type = message.Type,
                 Timestamp = DateTime.Now
             };
 
             await _messageService.SaveMessage(msg);
 
-            if (_connections.TryGetValue(recipientId, out var connectionId))
+            if (_connections.TryGetValue(msg.RecipientId, out var connectionId))
             {
                 await Clients.Client(connectionId).SendAsync("receiveMessage", new
                 {
                     Content = msg.Content,
-                    senderId = senderId,
-                    recipientId = recipientId,
+                    senderId = msg.SenderId,
+                    recipientId = msg.RecipientId,
                     type = msg.Type
                 });
             }
-            if (_connections.TryGetValue(senderId, out var senderConId))
+            if (_connections.TryGetValue(msg.SenderId, out var senderConId))
             {
                 await Clients.Client(senderConId).SendAsync("receiveMessage", new
                 {
                     Content = msg.Content,
-                    senderId = senderId,
-                    recipientId = recipientId,
+                    senderId = msg.SenderId,
+                    recipientId = msg.RecipientId,
                     type = msg.Type
-                });
-            }
-        }
-        [HubMethodName("sendFile")]
-        public async Task SendFile([FromBody] SendFileDto file)
-        {
-            // save
-            var fileDes = GetDescription(file.File);
-            var message = new Message
-            {
-                SenderId = file.SenderId,
-                RecipientId = file.RecipientId,
-                File = fileDes,
-                Timestamp = DateTime.Now,
-                Type = file.Type
-            };
-
-            await _messageService.SaveMessage(message);
-
-            if (_connections.TryGetValue(file.RecipientId, out var connectionId))
-            {
-                await Clients.Client(connectionId).SendAsync("receiveFile", new
-                {
-                    content = Convert.ToBase64String(message.File.Content.Content),
-                    senderId = message.SenderId,
-                    recipientId = message.RecipientId,
-                    type = file.Type
-                });
-            }
-            if (_connections.TryGetValue(file.SenderId, out var senderConId))
-            {
-                await Clients.Client(senderConId).SendAsync("receiveFile", new
-                {
-                    content = Convert.ToBase64String(message.File.Content.Content),
-                    senderId = message.SenderId,
-                    recipientId = message.RecipientId,
-                    type = file.Type
                 });
             }
         }
@@ -123,28 +87,6 @@ namespace gp_backend.Api
             {
                 return null;
             }
-        }
-        private FileDescription GetDescription(IFormFile file)
-        {
-            byte[] fileBytes;
-
-            using (var fs = file.OpenReadStream())
-            {
-                using (var sr = new BinaryReader(fs))
-                {
-                    fileBytes = sr.ReadBytes((int)file.Length);
-                }
-            }
-            var fileContent = new FileContent
-            {
-                Content = fileBytes
-            };
-            return new FileDescription
-            {
-                Content = fileContent,
-                ContentType = file.ContentType,
-                ContentDisposition = file.ContentDisposition,
-            };
         }
         #endregion
     }

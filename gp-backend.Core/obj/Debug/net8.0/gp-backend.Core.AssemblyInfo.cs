@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("gp-backend.Core")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+c7343fc943c5feb9843290291904619ccee19b52")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f710888fa98f9ff9a11c0ceb3b9e3d22a67ea954")]
 [assembly: System.Reflection.AssemblyProductAttribute("gp-backend.Core")]
 [assembly: System.Reflection.AssemblyTitleAttribute("gp-backend.Core")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
