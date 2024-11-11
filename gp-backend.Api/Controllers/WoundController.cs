@@ -28,7 +28,7 @@ namespace gp_backend.Api.Controllers
         }
 
         // add
-        [HttpPost("upload")]
+        [HttpPost("upload-type")]
         public async Task<IActionResult> Upload(IFormFile file)
         {
             try
@@ -102,6 +102,157 @@ namespace gp_backend.Api.Controllers
                 return StatusCode(500, new BaseResponse(false, new List<string> { ex.Message }, null));
             }
         }
+
+        [HttpPost("upload-burn")]
+        public async Task<IActionResult> UploadBurn(IFormFile file)
+        {
+            try
+            {
+                // check the properties validation
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new BaseResponse(state: false, message: ModelState.Values.SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage).ToList(), null));
+                }
+
+                // extract the file description
+                //var response = await CallFlaskEndPoint(file);
+                //if (response == null)
+                //    return BadRequest();
+                //Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains( response[0]));
+                Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains("disease"));
+
+
+                var fileDescription = GetDescription(file);
+                var uid = User.Claims.FirstOrDefault(x => x.Type == "uid").Value;
+
+                var user = await _userManager.FindByIdAsync(uid);
+
+                var wound = new Wound
+                {
+                    UploadDate = DateTime.Now.Date,
+                    User = user,
+                    ApplicationUserId = user.Id,
+                    Image = fileDescription
+                };
+                string diseaseName = "";
+                string description = "";
+                string risk = "";
+                var prevention = new List<string>();
+                if (diseasse is not null)
+                {
+                    wound.Disease.Add(diseasse);
+                    diseaseName += diseasse.Name;
+                    description += $"{diseaseName}: \n\n";
+                    description += diseasse.Description + "\n\n";
+                    prevention.AddRange(diseasse.Preventions);
+                    risk += diseasse.Risk;
+                }
+
+                wound.Disease.Add(diseasse);
+                diseaseName += diseasse.Name;
+                description += $"{diseaseName}: \n\n";
+                description += diseasse.Description + "\n\n";
+                prevention.AddRange(diseasse.Preventions);
+                risk += diseasse.Risk;
+
+
+                var result = await _woundRepo.InsertAsync(wound);
+                await _woundRepo.SaveAsync();
+
+                return Ok(new BaseResponse(true, new List<string> { "Uploaded Successfuly" }, new GetWoundDetailsDto
+                {
+                    Id = wound.Id,
+                    Name = diseaseName,
+                    Description = description,
+                    Image = Convert.ToBase64String(fileDescription.Content.Content),
+                    Preventions = prevention,
+                    Risk = risk,
+                    UploadDate = wound.UploadDate
+                }));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "an error occurred while uploading the file.");
+                return StatusCode(500, new BaseResponse(false, new List<string> { ex.Message }, null));
+            }
+        }
+
+        [HttpPost("upload-skin")]
+        public async Task<IActionResult> UploadSkin(IFormFile file)
+        {
+            try
+            {
+                // check the properties validation
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new BaseResponse(state: false, message: ModelState.Values.SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage).ToList(), null));
+                }
+
+                // extract the file description
+                //var response = await CallFlaskEndPoint(file);
+                //if (response == null)
+                //    return BadRequest();
+                //Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains( response[0]));
+                Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains("disease"));
+
+
+                var fileDescription = GetDescription(file);
+                var uid = User.Claims.FirstOrDefault(x => x.Type == "uid").Value;
+
+                var user = await _userManager.FindByIdAsync(uid);
+
+                var wound = new Wound
+                {
+                    UploadDate = DateTime.Now.Date,
+                    User = user,
+                    ApplicationUserId = user.Id,
+                    Image = fileDescription
+                };
+                string diseaseName = "";
+                string description = "";
+                string risk = "";
+                var prevention = new List<string>();
+                if (diseasse is not null)
+                {
+                    wound.Disease.Add(diseasse);
+                    diseaseName += diseasse.Name;
+                    description += $"{diseaseName}: \n\n";
+                    description += diseasse.Description + "\n\n";
+                    prevention.AddRange(diseasse.Preventions);
+                    risk += diseasse.Risk;
+                }
+
+                wound.Disease.Add(diseasse);
+                diseaseName += diseasse.Name;
+                description += $"{diseaseName}: \n\n";
+                description += diseasse.Description + "\n\n";
+                prevention.AddRange(diseasse.Preventions);
+                risk += diseasse.Risk;
+
+
+                var result = await _woundRepo.InsertAsync(wound);
+                await _woundRepo.SaveAsync();
+
+                return Ok(new BaseResponse(true, new List<string> { "Uploaded Successfuly" }, new GetWoundDetailsDto
+                {
+                    Id = wound.Id,
+                    Name = diseaseName,
+                    Description = description,
+                    Image = Convert.ToBase64String(fileDescription.Content.Content),
+                    Preventions = prevention,
+                    Risk = risk,
+                    UploadDate = wound.UploadDate
+                }));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "an error occurred while uploading the file.");
+                return StatusCode(500, new BaseResponse(false, new List<string> { ex.Message }, null));
+            }
+        }
+
         [HttpGet("get-all")]
         public async Task<IActionResult> GetAll()
         {
