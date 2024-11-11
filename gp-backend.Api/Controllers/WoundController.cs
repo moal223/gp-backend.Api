@@ -45,7 +45,7 @@ namespace gp_backend.Api.Controllers
                 //if (response == null)
                 //    return BadRequest();
                 //Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains( response[0]));
-                Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains( "disease"));
+                Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains( "type"));
 
 
                 var fileDescription = GetDescription(file);
@@ -120,7 +120,7 @@ namespace gp_backend.Api.Controllers
                 //if (response == null)
                 //    return BadRequest();
                 //Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains( response[0]));
-                Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains("disease"));
+                Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains("burn"));
 
 
                 var fileDescription = GetDescription(file);
@@ -195,7 +195,7 @@ namespace gp_backend.Api.Controllers
                 //if (response == null)
                 //    return BadRequest();
                 //Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains( response[0]));
-                Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains("disease"));
+                Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains("skin-disease"));
 
 
                 var fileDescription = GetDescription(file);
