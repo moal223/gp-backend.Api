@@ -57,7 +57,8 @@ namespace gp_backend.Api
                 {
                     Content = msg.Content,
                     senderId = senderId,
-                    recipientId = recipientId
+                    recipientId = recipientId,
+                    type = msg.Type
                 });
             }
             if (_connections.TryGetValue(senderId, out var senderConId))
@@ -66,7 +67,8 @@ namespace gp_backend.Api
                 {
                     Content = msg.Content,
                     senderId = senderId,
-                    recipientId = recipientId
+                    recipientId = recipientId,
+                    type = msg.Type
                 });
             }
         }
