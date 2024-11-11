@@ -1,6 +1,8 @@
-﻿using gp_backend.Core.Models;
+﻿using gp_backend.Api.Dtos.Chat;
+using gp_backend.Core.Models;
 using gp_backend.EF.MySql.Repositories.Interfaces;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 using System.Collections.Concurrent;
 
@@ -68,6 +70,43 @@ namespace gp_backend.Api
                 });
             }
         }
+        [HubMethodName("sendFile")]
+        public async Task SendFile([FromBody] SendFileDto file)
+        {
+            // save
+            var fileDes = GetDescription(file.File);
+            var message = new Message
+            {
+                SenderId = file.SenderId,
+                RecipientId = file.RecipientId,
+                File = fileDes,
+                Timestamp = DateTime.Now,
+                Type = file.Type
+            };
+
+            await _messageService.SaveMessage(message);
+
+            if (_connections.TryGetValue(file.RecipientId, out var connectionId))
+            {
+                await Clients.Client(connectionId).SendAsync("receiveFile", new
+                {
+                    content = Convert.ToBase64String(message.File.Content.Content),
+                    senderId = message.SenderId,
+                    recipientId = message.RecipientId,
+                    type = file.Type
+                });
+            }
+            if (_connections.TryGetValue(file.SenderId, out var senderConId))
+            {
+                await Clients.Client(senderConId).SendAsync("receiveFile", new
+                {
+                    content = Convert.ToBase64String(message.File.Content.Content),
+                    senderId = message.SenderId,
+                    recipientId = message.RecipientId,
+                    type = file.Type
+                });
+            }
+        }
 
 
         #region Methods
@@ -82,6 +121,28 @@ namespace gp_backend.Api
             {
                 return null;
             }
+        }
+        private FileDescription GetDescription(IFormFile file)
+        {
+            byte[] fileBytes;
+
+            using (var fs = file.OpenReadStream())
+            {
+                using (var sr = new BinaryReader(fs))
+                {
+                    fileBytes = sr.ReadBytes((int)file.Length);
+                }
+            }
+            var fileContent = new FileContent
+            {
+                Content = fileBytes
+            };
+            return new FileDescription
+            {
+                Content = fileContent,
+                ContentType = file.ContentType,
+                ContentDisposition = file.ContentDisposition,
+            };
         }
         #endregion
     }
