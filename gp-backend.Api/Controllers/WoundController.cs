@@ -6,6 +6,9 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using gp_backend.Api.Dtos.Wound;
+using System.Net.Http;
+using System.Text;
+using Newtonsoft.Json;
 
 namespace gp_backend.Api.Controllers
 {
@@ -18,13 +21,15 @@ namespace gp_backend.Api.Controllers
         private readonly ILogger<WoundController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IGenericRepo<Disease> _diseaseRepo;
+        private readonly HttpClient _cobilot;
         public WoundController(IGenericRepo<Wound> woundRepo, ILogger<WoundController> logger,
-        IGenericRepo<Disease> diseaseRepo, UserManager<ApplicationUser> userManager)
+        IGenericRepo<Disease> diseaseRepo, UserManager<ApplicationUser> userManager, HttpClient cobilot)
         {
             _woundRepo = woundRepo;
             _logger = logger;
             _userManager = userManager;
             _diseaseRepo = diseaseRepo;
+            _cobilot = cobilot;
         }
 
         // add
@@ -45,7 +50,7 @@ namespace gp_backend.Api.Controllers
                 //if (response == null)
                 //    return BadRequest();
                 //Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains( response[0]));
-                Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains( "type"));
+                Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains("type"));
 
 
                 var fileDescription = GetDescription(file);
@@ -75,13 +80,13 @@ namespace gp_backend.Api.Controllers
                 }
 
                 wound.Disease.Add(diseasse);
-                    diseaseName += diseasse.Name;
-                    description += $"{diseaseName}: \n\n";
-                    description += diseasse.Description + "\n\n";
-                    prevention.AddRange(diseasse.Preventions);
-                    risk += diseasse.Risk;
+                diseaseName += diseasse.Name;
+                description += $"{diseaseName}: \n\n";
+                description += diseasse.Description + "\n\n";
+                prevention.AddRange(diseasse.Preventions);
+                risk += diseasse.Risk;
 
-                
+
                 var result = await _woundRepo.InsertAsync(wound);
                 await _woundRepo.SaveAsync();
 
@@ -370,5 +375,6 @@ namespace gp_backend.Api.Controllers
                 }
             }
         }
+
     }
 }

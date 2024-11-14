@@ -70,6 +70,8 @@ builder.Services.AddScoped<ISpecialRepo, SpecialRepo>();
 builder.Services.AddScoped<IMessageRepo, MessageRepo>();
 builder.Services.AddScoped<IAppointmentRepo, AppointmentRepo>();
 builder.Services.AddLogging();
+builder.Services.AddHttpClient();
+
 
 builder.Services.AddCors(options =>
 {
