@@ -6,9 +6,13 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Headers;
 using gp_backend.Api.Dtos.Wound;
+using Mscc.GenerativeAI;
 using System.Net.Http;
 using System.Text;
 using Newtonsoft.Json;
+using System.Text.Json.Serialization;
+using System.Text.Json;
+using Microsoft.Identity.Client;
 
 namespace gp_backend.Api.Controllers
 {
@@ -21,15 +25,13 @@ namespace gp_backend.Api.Controllers
         private readonly ILogger<WoundController> _logger;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IGenericRepo<Disease> _diseaseRepo;
-        private readonly HttpClient _cobilot;
         public WoundController(IGenericRepo<Wound> woundRepo, ILogger<WoundController> logger,
-        IGenericRepo<Disease> diseaseRepo, UserManager<ApplicationUser> userManager, HttpClient cobilot)
+        IGenericRepo<Disease> diseaseRepo, UserManager<ApplicationUser> userManager)
         {
             _woundRepo = woundRepo;
             _logger = logger;
             _userManager = userManager;
             _diseaseRepo = diseaseRepo;
-            _cobilot = cobilot;
         }
 
         // add
@@ -45,15 +47,19 @@ namespace gp_backend.Api.Controllers
                         .Select(e => e.ErrorMessage).ToList(), null));
                 }
 
-                // extract the file description
+                var fileDescription = GetDescription(file);
+
+                if(!(await checkInjury(fileDescription.Content.Content)))
+                {
+                    return Ok(new BaseResponse(true, ["You are health"], null));
+                }
+
                 //var response = await CallFlaskEndPoint(file);
                 //if (response == null)
                 //    return BadRequest();
-                //Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains( response[0]));
                 Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains("type"));
 
 
-                var fileDescription = GetDescription(file);
                 var uid = User.Claims.FirstOrDefault(x => x.Type == "uid").Value;
 
                 var user = await _userManager.FindByIdAsync(uid);
@@ -78,10 +84,13 @@ namespace gp_backend.Api.Controllers
                     prevention.AddRange(diseasse.Preventions);
                     risk += diseasse.Risk;
                 }
+                else
+                {
+                    return NoContent();
+                }
 
                 wound.Disease.Add(diseasse);
                 diseaseName += diseasse.Name;
-                description += $"{diseaseName}: \n\n";
                 description += diseasse.Description + "\n\n";
                 prevention.AddRange(diseasse.Preventions);
                 risk += diseasse.Risk;
@@ -120,15 +129,19 @@ namespace gp_backend.Api.Controllers
                         .Select(e => e.ErrorMessage).ToList(), null));
                 }
 
-                // extract the file description
+                var fileDescription = GetDescription(file);
+
+                if (!(await checkInjury(fileDescription.Content.Content)))
+                {
+                    return Ok(new BaseResponse(true, ["You are health"], null));
+                }
+
                 //var response = await CallFlaskEndPoint(file);
                 //if (response == null)
                 //    return BadRequest();
-                //Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains( response[0]));
+
                 Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains("burn"));
 
-
-                var fileDescription = GetDescription(file);
                 var uid = User.Claims.FirstOrDefault(x => x.Type == "uid").Value;
 
                 var user = await _userManager.FindByIdAsync(uid);
@@ -148,11 +161,12 @@ namespace gp_backend.Api.Controllers
                 {
                     wound.Disease.Add(diseasse);
                     diseaseName += diseasse.Name;
-                    description += $"{diseaseName}: \n\n";
                     description += diseasse.Description + "\n\n";
                     prevention.AddRange(diseasse.Preventions);
                     risk += diseasse.Risk;
                 }
+                else
+                    return NoContent();
 
                 wound.Disease.Add(diseasse);
                 diseaseName += diseasse.Name;
@@ -195,15 +209,19 @@ namespace gp_backend.Api.Controllers
                         .Select(e => e.ErrorMessage).ToList(), null));
                 }
 
-                // extract the file description
+                var fileDescription = GetDescription(file);
+
+                if (!(await checkInjury(fileDescription.Content.Content)))
+                {
+                    return Ok(new BaseResponse(true, ["You are health"], null));
+                }
+
                 //var response = await CallFlaskEndPoint(file);
                 //if (response == null)
                 //    return BadRequest();
-                //Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains( response[0]));
+
                 Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains("skin-disease"));
 
-
-                var fileDescription = GetDescription(file);
                 var uid = User.Claims.FirstOrDefault(x => x.Type == "uid").Value;
 
                 var user = await _userManager.FindByIdAsync(uid);
@@ -223,7 +241,6 @@ namespace gp_backend.Api.Controllers
                 {
                     wound.Disease.Add(diseasse);
                     diseaseName += diseasse.Name;
-                    description += $"{diseaseName}: \n\n";
                     description += diseasse.Description + "\n\n";
                     prevention.AddRange(diseasse.Preventions);
                     risk += diseasse.Risk;
@@ -231,7 +248,6 @@ namespace gp_backend.Api.Controllers
 
                 wound.Disease.Add(diseasse);
                 diseaseName += diseasse.Name;
-                description += $"{diseaseName}: \n\n";
                 description += diseasse.Description + "\n\n";
                 prevention.AddRange(diseasse.Preventions);
                 risk += diseasse.Risk;
@@ -374,6 +390,38 @@ namespace gp_backend.Api.Controllers
                     return result.Output;
                 }
             }
+        }
+
+        private async Task<bool> checkInjury(byte[] content)
+        {
+            string apiKey = "AIzaSyBqbVNDd33iaNJ1PInprBhs8ZUjTFZBIwE";
+            var googleAI = new GoogleAI(apiKey: apiKey);
+            var model = googleAI.GenerativeModel(model: Model.Gemini15FlashLatest);
+            var prompt = "can you tell me if there is injury or skin disease in this image? answer only with yes or no. if you can not answer with no only";
+
+            var request = new GenerateContentRequest(prompt);
+
+            // save the image in the folder
+
+            var filePath = Path.Combine("wwwroot", "images", "uploaded-image.png");
+            await System.IO.File.WriteAllBytesAsync(filePath, content);
+
+            // https://www.kasandbox.org/programming-images/avatars/purple-pi.png
+            if (!System.IO.File.Exists(filePath))
+                return false;
+
+            await request.AddMedia("https://gp-backend-api.onrender.com/images/uploaded-image.png");
+            var response = await model.GenerateContent(request);
+
+            string answer = response.Text.Substring(0, 3).ToLower();
+
+            //delete the image
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
+
+            return answer.Contains("no");
         }
 
     }

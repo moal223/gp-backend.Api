@@ -91,7 +91,7 @@ using (var scope = app.Services.CreateScope())
     var dbContext = scope.ServiceProvider.GetRequiredService<MySqlDbContext>();
     dbContext.Database.Migrate();
 }
-
+app.UseStaticFiles();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
