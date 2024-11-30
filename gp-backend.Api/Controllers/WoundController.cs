@@ -421,7 +421,7 @@ namespace gp_backend.Api.Controllers
                 System.IO.File.Delete(filePath);
             }
 
-            return answer.Contains("no");
+            return answer.Contains("yes");
         }
 
     }
