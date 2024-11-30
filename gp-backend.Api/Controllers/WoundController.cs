@@ -403,14 +403,14 @@ namespace gp_backend.Api.Controllers
 
             // save the image in the folder
 
-            var filePath = Path.Combine("wwwroot", "images", "uploaded-image.png");
+            var filePath = Path.Combine("wwwroot", "images", "image.png");
             await System.IO.File.WriteAllBytesAsync(filePath, content);
 
             // https://www.kasandbox.org/programming-images/avatars/purple-pi.png
             if (!System.IO.File.Exists(filePath))
                 return false;
 
-            await request.AddMedia("https://gp-backend-api.onrender.com/images/uploaded-image.png");
+            await request.AddMedia("https://gp-backend-api.onrender.com/images/image.png");
             var response = await model.GenerateContent(request);
 
             string answer = response.Text.Substring(0, 3).ToLower();
