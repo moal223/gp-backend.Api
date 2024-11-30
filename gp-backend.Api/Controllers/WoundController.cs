@@ -416,10 +416,10 @@ namespace gp_backend.Api.Controllers
             string answer = response.Text.Substring(0, 3).ToLower();
 
             //delete the image
-            //if (System.IO.File.Exists(filePath))
-            //{
-            //    System.IO.File.Delete(filePath);
-            //}
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
 
             return answer.Contains("no");
         }
