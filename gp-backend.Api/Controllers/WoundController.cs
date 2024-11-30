@@ -75,26 +75,17 @@ namespace gp_backend.Api.Controllers
                 string description = "";
                 string risk = "";
                 var prevention = new List<string>();
-                if (diseasse is not null)
-                {
-                    wound.Disease.Add(diseasse);
-                    diseaseName += diseasse.Name;
-                    description += $"{diseaseName}: \n\n";
-                    description += diseasse.Description + "\n\n";
-                    prevention.AddRange(diseasse.Preventions);
-                    risk += diseasse.Risk;
-                }
-                else
+                if (diseasse == null)
                 {
                     return NoContent();
                 }
 
                 wound.Disease.Add(diseasse);
                 diseaseName += diseasse.Name;
+                description += $"{diseaseName}: \n\n";
                 description += diseasse.Description + "\n\n";
                 prevention.AddRange(diseasse.Preventions);
                 risk += diseasse.Risk;
-
 
                 var result = await _woundRepo.InsertAsync(wound);
                 await _woundRepo.SaveAsync();
