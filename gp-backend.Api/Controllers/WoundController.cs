@@ -378,7 +378,7 @@ namespace gp_backend.Api.Controllers
                     fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
                     content.Add(fileContent, "file", file.FileName);
 
-                    var response = await client.PostAsync($"https://a910-105-197-94-90.ngrok-free.app/{endpoint}", content);
+                    var response = await client.PostAsync($"https://b8bb-105-197-94-90.ngrok-free.app/{endpoint}", content);
                     if (!response.IsSuccessStatusCode)
                         return [""];
 
