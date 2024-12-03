@@ -54,10 +54,10 @@ namespace gp_backend.Api.Controllers
                     return Ok(new BaseResponse(true, ["You are health"], null));
                 }
 
-                //var response = await CallFlaskEndPoint(file);
-                //if (response == null)
-                //    return BadRequest();
-                Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains("type"));
+                var response = await CallFlaskEndPoint(file, "type");
+                if (response == null)
+                    return BadRequest();
+                Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains(response[0]));
 
 
                 var uid = User.Claims.FirstOrDefault(x => x.Type == "uid").Value;
@@ -75,6 +75,7 @@ namespace gp_backend.Api.Controllers
                 string description = "";
                 string risk = "";
                 var prevention = new List<string>();
+
                 if (diseasse == null)
                 {
                     return NoContent();
@@ -127,7 +128,7 @@ namespace gp_backend.Api.Controllers
                     return Ok(new BaseResponse(true, ["You are health"], null));
                 }
 
-                var response = await CallFlaskEndPoint(file);
+                var response = await CallFlaskEndPoint(file, "burn");
                 if (response == null)
                     return BadRequest();
 
@@ -207,11 +208,14 @@ namespace gp_backend.Api.Controllers
                     return Ok(new BaseResponse(true, ["You are health"], null));
                 }
 
-                //var response = await CallFlaskEndPoint(file);
-                //if (response == null)
-                //    return BadRequest();
+                var response = await CallFlaskEndPoint(file, "skin");
+                if (response == null)
+                    return BadRequest();
 
-                Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains("skin-disease"));
+                Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains(response[0]));
+
+                if (diseasse == null)
+                    return NoContent();
 
                 var uid = User.Claims.FirstOrDefault(x => x.Type == "uid").Value;
 
@@ -361,11 +365,11 @@ namespace gp_backend.Api.Controllers
                 ContentDisposition = file.ContentDisposition,
             };
         }
-        private async Task<List<string>> CallFlaskEndPoint(IFormFile file)
+        private async Task<List<string>> CallFlaskEndPoint(IFormFile file, string endpoint)
         {
             using(var client = new HttpClient())
             {
-                client.BaseAddress = new Uri("https://9160-105-197-94-90.ngrok-free.app");
+                //client.BaseAddress = new Uri("https://9160-105-197-94-90.ngrok-free.app");
                 using(var content = new MultipartFormDataContent())
                 {
                     var fileStream = file.OpenReadStream();
@@ -374,7 +378,9 @@ namespace gp_backend.Api.Controllers
                     fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
                     content.Add(fileContent, "file", file.FileName);
 
-                    var response = await client.PostAsync("/burn", content);
+                    var response = await client.PostAsync($"https://a910-105-197-94-90.ngrok-free.app/{endpoint}", content);
+                    if (!response.IsSuccessStatusCode)
+                        return [""];
 
                     var result = await response.Content.ReadFromJsonAsync<WoundIdDto>();
 
