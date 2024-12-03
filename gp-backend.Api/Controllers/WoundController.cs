@@ -127,11 +127,11 @@ namespace gp_backend.Api.Controllers
                     return Ok(new BaseResponse(true, ["You are health"], null));
                 }
 
-                //var response = await CallFlaskEndPoint(file);
-                //if (response == null)
-                //    return BadRequest();
+                var response = await CallFlaskEndPoint(file);
+                if (response == null)
+                    return BadRequest();
 
-                Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains("burn"));
+                Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains(response[0]));
 
                 var uid = User.Claims.FirstOrDefault(x => x.Type == "uid").Value;
 
@@ -365,7 +365,7 @@ namespace gp_backend.Api.Controllers
         {
             using(var client = new HttpClient())
             {
-                client.BaseAddress = new Uri("https://ml-deploy-production-758c.up.railway.app");
+                client.BaseAddress = new Uri("https://9160-105-197-94-90.ngrok-free.app");
                 using(var content = new MultipartFormDataContent())
                 {
                     var fileStream = file.OpenReadStream();
@@ -374,7 +374,7 @@ namespace gp_backend.Api.Controllers
                     fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
                     content.Add(fileContent, "file", file.FileName);
 
-                    var response = await client.PostAsync("/predict", content);
+                    var response = await client.PostAsync("/burn", content);
 
                     var result = await response.Content.ReadFromJsonAsync<WoundIdDto>();
 
