@@ -23,17 +23,21 @@ namespace gp_backend.Api
             var userId = Context.GetHttpContext().Request.Query["uid"];
             var user = await getUserById(userId);
             if (user != null)
+            {
                 _connections[userId] = Context.ConnectionId;
+                await Groups.AddToGroupAsync(Context.ConnectionId, userId);
+            }
 
             await base.OnConnectedAsync();
         }
 
-        public override Task OnDisconnectedAsync(Exception? exception)
+        public override async Task<Task> OnDisconnectedAsync(Exception? exception)
         {
             var userId = _connections.FirstOrDefault(x => x.Value == Context.ConnectionId).Key;
             if (userId != null)
             {
                 _connections.TryRemove(userId, out _);
+                await Groups.RemoveFromGroupAsync(Context.ConnectionId, userId); // Remove user from the group
             }
 
             return base.OnDisconnectedAsync(exception);

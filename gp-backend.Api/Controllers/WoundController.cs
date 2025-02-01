@@ -385,7 +385,6 @@ namespace gp_backend.Api.Controllers
             var filePath = Path.Combine("wwwroot", "images", "image.png");
             await System.IO.File.WriteAllBytesAsync(filePath, content);
 
-            // https://www.kasandbox.org/programming-images/avatars/purple-pi.png
             if (!System.IO.File.Exists(filePath))
                 return false;
 
