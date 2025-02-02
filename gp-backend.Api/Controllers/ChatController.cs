@@ -49,7 +49,9 @@ namespace gp_backend.Api.Controllers
             {
                 SenderId = senderId,
                 RecipientId = receiverId,
-                Content = fileUrl,
+                FileUrl = fileUrl,
+                FileName = fileName,
+                FilePath = $"SkinScan/{fileName}",
                 Type = "image",
                 Timestamp = DateTime.Now
             };
@@ -61,8 +63,11 @@ namespace gp_backend.Api.Controllers
             await _hubContext.Clients.Group(receiverId).SendAsync("ReceiveFile", new
             {
                 Sender = senderId,
+                RecipientId = receiverId,
+                FilePath = $"SkinScan/{fileName}",
                 FileUrl = fileUrl,
-                FileName = file.FileName
+                FileName = file.FileName,
+                Type = "image"
             });
 
             return Ok(new { FileUrl = fileUrl });

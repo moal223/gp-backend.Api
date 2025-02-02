@@ -50,7 +50,7 @@ namespace gp_backend.Api
                 SenderId = message.SenderId,
                 RecipientId = message.RecipientId,
                 Content = message.Content,
-                Type = message.Type,
+                Type = "text",
                 Timestamp = DateTime.Now
             };
 
@@ -63,7 +63,7 @@ namespace gp_backend.Api
                     Content = msg.Content,
                     senderId = msg.SenderId,
                     recipientId = msg.RecipientId,
-                    type = msg.Type
+                    type = "text"
                 });
             }
             if (_connections.TryGetValue(msg.SenderId, out var senderConId))
@@ -73,7 +73,7 @@ namespace gp_backend.Api
                     Content = msg.Content,
                     senderId = msg.SenderId,
                     recipientId = msg.RecipientId,
-                    type = msg.Type
+                    type = "text"
                 });
             }
         }
