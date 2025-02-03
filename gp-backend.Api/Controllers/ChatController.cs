@@ -66,7 +66,7 @@ namespace gp_backend.Api.Controllers
                 RecipientId = receiverId,
                 FilePath = $"SkinScan/{fileName}",
                 FileUrl = fileUrl,
-                FileName = file.FileName,
+                FileName = fileName,
                 Type = "image"
             });
 
