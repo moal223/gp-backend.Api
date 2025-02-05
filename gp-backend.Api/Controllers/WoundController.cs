@@ -49,12 +49,13 @@ namespace gp_backend.Api.Controllers
 
                 var fileDescription = GetDescription(file);
 
-                if(!(await checkInjury(fileDescription.Content.Content)))
-                {
-                    return Ok(new BaseResponse(true, ["You are health"], null));
-                }
+                //if(!(await checkInjury(fileDescription.Content.Content)))
+                //{
+                //    return Ok(new BaseResponse(true, ["You are health"], null));
+                //}
 
                 var response = await CallFlaskEndPoint(file, "type");
+                string mask = await GetTheMask(file);
                 if (response == null)
                     return BadRequest();
                 Disease diseasse = (await _diseaseRepo.GetAllAsync("")).FirstOrDefault(x => x.Name.Contains(response[0]));
@@ -95,7 +96,7 @@ namespace gp_backend.Api.Controllers
                     Id = wound.Id,
                     Name = diseaseName,
                     Description = description,
-                    Image = Convert.ToBase64String(fileDescription.Content.Content),
+                    Image = mask,
                     Preventions = prevention,
                     Risk = risk,
                     UploadDate = wound.UploadDate
@@ -114,11 +115,11 @@ namespace gp_backend.Api.Controllers
             try
             {
                 // check the properties validation
-                if (!ModelState.IsValid)
-                {
-                    return BadRequest(new BaseResponse(state: false, message: ModelState.Values.SelectMany(v => v.Errors)
-                        .Select(e => e.ErrorMessage).ToList(), null));
-                }
+                //if (!ModelState.IsValid)
+                //{
+                //    return BadRequest(new BaseResponse(state: false, message: ModelState.Values.SelectMany(v => v.Errors)
+                //        .Select(e => e.ErrorMessage).ToList(), null));
+                //}
 
                 var fileDescription = GetDescription(file);
 
@@ -128,6 +129,10 @@ namespace gp_backend.Api.Controllers
                 }
 
                 var response = await CallFlaskEndPoint(file, "burn");
+
+                // call the mask
+                string mask = await GetTheMask(file);
+
                 if (response == null)
                     return BadRequest();
 
@@ -166,7 +171,7 @@ namespace gp_backend.Api.Controllers
                     Id = wound.Id,
                     Name = diseaseName,
                     Description = description,
-                    Image = Convert.ToBase64String(fileDescription.Content.Content),
+                    Image = mask,
                     Preventions = prevention,
                     Risk = risk,
                     UploadDate = wound.UploadDate
@@ -193,12 +198,13 @@ namespace gp_backend.Api.Controllers
 
                 var fileDescription = GetDescription(file);
 
-                if (!(await checkInjury(fileDescription.Content.Content)))
-                {
-                    return Ok(new BaseResponse(true, ["You are health"], null));
-                }
+                //if (!(await checkInjury(fileDescription.Content.Content)))
+                //{
+                //    return Ok(new BaseResponse(true, ["You are health"], null));
+                //}
 
                 var response = await CallFlaskEndPoint(file, "skin");
+                string mask = await GetTheMask(file);
                 if (response == null)
                     return BadRequest();
 
@@ -238,7 +244,7 @@ namespace gp_backend.Api.Controllers
                     Id = wound.Id,
                     Name = diseaseName,
                     Description = description,
-                    Image = Convert.ToBase64String(fileDescription.Content.Content),
+                    Image =mask,
                     Preventions = prevention,
                     Risk = risk,
                     UploadDate = wound.UploadDate
@@ -371,9 +377,33 @@ namespace gp_backend.Api.Controllers
             }
         }
 
+        private async Task<string> GetTheMask(IFormFile file)
+        {
+            using (var client = new HttpClient())
+            {
+                //client.BaseAddress = new Uri("https://9160-105-197-94-90.ngrok-free.app");
+                using (var content = new MultipartFormDataContent())
+                {
+                    var fileStream = file.OpenReadStream();
+                    var fileContent = new StreamContent(fileStream);
+
+                    fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
+                    content.Add(fileContent, "file", file.FileName);
+
+                    var response = await client.PostAsync($" https://39b7-102-189-121-121.ngrok-free.app/location", content);
+                    if (!response.IsSuccessStatusCode)
+                        return "";
+
+                    var result = await response.Content.ReadFromJsonAsync<MaskDto>();
+
+                    return result.Output;
+                }
+            }
+        }
+
         private async Task<bool> checkInjury(byte[] content)
         {
-            string apiKey = "AIzaSyBqbVNDd33iaNJ1PInprBhs8ZUjTFZBIwE";
+            string apiKey = "AIzaSyBmVnnwiEoKcJTGMBXZptF1Y1cUU7fat0g";
             var googleAI = new GoogleAI(apiKey: apiKey);
             var model = googleAI.GenerativeModel(model: Model.Gemini15FlashLatest);
             var prompt = "can you tell me if there is injury or skin disease in this image? answer only with yes or no. if you can not answer with no only";
@@ -388,18 +418,44 @@ namespace gp_backend.Api.Controllers
             if (!System.IO.File.Exists(filePath))
                 return false;
 
-            await request.AddMedia("https://gp-backend-api.onrender.com/images/image.png");
-            var response = await model.GenerateContent(request);
+            await request.AddMedia("http://localhost:5093/images/image.png");
 
-            string answer = response.Text.Substring(0, 3).ToLower();
+            int retries = 3;
+            while (retries > 0)
+            {
+                try
+                {
+                    var response = await model.GenerateContent(request);
+                    string answer = response.Text.Substring(0, 3).ToLower();
 
-            //delete the image
+                    // Delete the image
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
+
+                    return answer.Contains("yes");
+                }
+                catch (Exception ex)
+                {
+                    if (retries == 0 || !ex.Message.Contains("overloaded"))
+                    {
+                        // Log the error or handle the exception
+                        return false;
+                    }
+
+                    retries--;
+                    await Task.Delay(TimeSpan.FromSeconds(5 * (3 - retries)));  // Exponential backoff
+                }
+            }
+
+            // Delete the image if the request failed
             if (System.IO.File.Exists(filePath))
             {
                 System.IO.File.Delete(filePath);
             }
 
-            return answer.Contains("yes");
+            return false;
         }
 
     }
