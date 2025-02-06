@@ -115,18 +115,18 @@ namespace gp_backend.Api.Controllers
             try
             {
                 // check the properties validation
-                //if (!ModelState.IsValid)
-                //{
-                //    return BadRequest(new BaseResponse(state: false, message: ModelState.Values.SelectMany(v => v.Errors)
-                //        .Select(e => e.ErrorMessage).ToList(), null));
-                //}
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(new BaseResponse(state: false, message: ModelState.Values.SelectMany(v => v.Errors)
+                        .Select(e => e.ErrorMessage).ToList(), null));
+                }
 
                 var fileDescription = GetDescription(file);
 
-                if (!(await checkInjury(fileDescription.Content.Content)))
-                {
-                    return Ok(new BaseResponse(true, ["You are health"], null));
-                }
+                //if (!(await checkInjury(fileDescription.Content.Content)))
+                //{
+                //    return Ok(new BaseResponse(true, ["You are health"], null));
+                //}
 
                 var response = await CallFlaskEndPoint(file, "burn");
 
@@ -366,7 +366,7 @@ namespace gp_backend.Api.Controllers
                     fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
                     content.Add(fileContent, "file", file.FileName);
 
-                    var response = await client.PostAsync($"https://1ae1-105-42-238-252.ngrok-free.app/{endpoint}", content);
+                    var response = await client.PostAsync($"https://39b7-102-189-121-121.ngrok-free.app/{endpoint}", content);
                     if (!response.IsSuccessStatusCode)
                         return [""];
 
