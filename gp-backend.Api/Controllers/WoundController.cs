@@ -370,9 +370,17 @@ namespace gp_backend.Api.Controllers
                     if (!response.IsSuccessStatusCode)
                         return [""];
 
-                    var result = await response.Content.ReadFromJsonAsync<WoundIdDto>();
-
-                    return result.Output;
+                    if(endpoint == "type")
+                    {
+                        var result = await response.Content.ReadFromJsonAsync<MaskDto>();
+                        return [result.Output];
+                    }
+                    else
+                    {
+                        var result = await response.Content.ReadFromJsonAsync<WoundIdDto>();
+                        return result.Output;
+                    }
+                        
                 }
             }
         }
