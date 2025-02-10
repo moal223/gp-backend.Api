@@ -366,7 +366,7 @@ namespace gp_backend.Api.Controllers
                     fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
                     content.Add(fileContent, "file", file.FileName);
 
-                    var response = await client.PostAsync($"https://3f06-102-189-106-111.ngrok-free.app/{endpoint}", content);
+                    var response = await client.PostAsync($"https://a7e8-105-197-18-45.ngrok-free.app/{endpoint}", content);
                     if (!response.IsSuccessStatusCode)
                         return [""];
 
@@ -398,7 +398,7 @@ namespace gp_backend.Api.Controllers
                     fileContent.Headers.ContentType = new MediaTypeHeaderValue(file.ContentType);
                     content.Add(fileContent, "file", file.FileName);
 
-                    var response = await client.PostAsync($"https://3f06-102-189-106-111.ngrok-free.app/location", content);
+                    var response = await client.PostAsync($"https://a7e8-105-197-18-45.ngrok-free.app/location", content);
                     if (!response.IsSuccessStatusCode)
                         return "";
 
