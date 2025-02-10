@@ -47,9 +47,9 @@ namespace gp_backend.Api.Controllers
             return Ok(new BaseResponse(true, ["Success"], new GetAppointmentDetails
             {
                 Id = appointment.Id,
-                DoctorName = doctor.FullName,
+                PatientName = doctor.FullName,
                 AppointmentDate = appointment.AppointmentDate,
-                DoctorId = doctor.Id
+                PatientId = doctor.Id
             }));
         }
 
@@ -68,8 +68,8 @@ namespace gp_backend.Api.Controllers
                 {
                     Id = appointment.Id,
                     AppointmentDate = appointment.AppointmentDate,
-                    DoctorId = appointment.Doctor.Id,
-                    DoctorName = appointment.Doctor.FullName
+                    PatientId = appointment.Patient.Id,
+                    PatientName = appointment.Patient.FullName
                 }) ;
             }
             return Ok(new BaseResponse(true, ["Sucess"], appointmentsDto));

@@ -16,7 +16,7 @@ namespace gp_backend.EF.MySql.Repositories
         {
             if(doctorId == null)
                 return Enumerable.Empty<Appointment>();
-            return _context.Appointments.Include(a => a.Doctor).Where(a => a.Doctor.Id == doctorId).ToList();
+            return _context.Appointments.Include(a => a.Patient).Where(a => a.Patient.Id == doctorId).ToList();
         }
 
         public async Task<Appointment> Insert(Appointment appointment)
