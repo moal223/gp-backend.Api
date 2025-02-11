@@ -12,11 +12,11 @@ namespace gp_backend.EF.MySql.Repositories
         {
             _context = context;
         }
-        public async Task<IEnumerable<Appointment>> GetAll(string doctorId)
+        public async Task<IEnumerable<Appointment>> GetAll(string Id)
         {
-            if(doctorId == null)
+            if(Id == null)
                 return Enumerable.Empty<Appointment>();
-            return _context.Appointments.Include(a => a.Patient).Where(a => a.Patient.Id == doctorId).ToList();
+            return _context.Appointments.Include(a => a.Patient).Where(a => a.Patient.Id == Id).ToList();
         }
 
         public async Task<Appointment> Insert(Appointment appointment)
