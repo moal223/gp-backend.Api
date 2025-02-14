@@ -426,7 +426,7 @@ namespace gp_backend.Api.Controllers
             if (!System.IO.File.Exists(filePath))
                 return false;
 
-            await request.AddMedia("http://localhost:5093/images/image.png");
+            await request.AddMedia("https://gp-backend-api.onrender.com/images/image.png");
 
             int retries = 3;
             while (retries > 0)
