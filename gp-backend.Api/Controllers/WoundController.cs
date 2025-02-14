@@ -123,10 +123,10 @@ namespace gp_backend.Api.Controllers
 
                 var fileDescription = GetDescription(file);
 
-                //if (!(await checkInjury(fileDescription.Content.Content)))
-                //{
-                //    return Ok(new BaseResponse(true, ["You are health"], null));
-                //}
+                if (!(await checkInjury(fileDescription.Content.Content)))
+                {
+                    return Ok(new BaseResponse(true, ["You are health"], null));
+                }
 
                 var response = await CallFlaskEndPoint(file, "burn");
 
@@ -409,62 +409,62 @@ namespace gp_backend.Api.Controllers
             }
         }
 
-        //private async Task<bool> checkInjury(byte[] content)
-        //{
-        //    string apiKey = "AIzaSyBmVnnwiEoKcJTGMBXZptF1Y1cUU7fat0g";
-        //    var googleAI = new GoogleAI(apiKey: apiKey);
-        //    var model = googleAI.GenerativeModel(model: Model.Gemini15FlashLatest);
-        //    var prompt = "can you tell me if there is injury or skin disease in this image? answer only with yes or no. if you can not answer with no only";
+        private async Task<bool> checkInjury(byte[] content)
+        {
+            string apiKey = "AIzaSyDTUOEPZNk_um1U9p_eEl2HMmOECDJPqd0";
+            var googleAI = new GoogleAI(apiKey: apiKey);
+            var model = googleAI.GenerativeModel(model: Model.Gemini15FlashLatest);
+            var prompt = "can you tell me if there is injury or skin disease in this image? answer only with yes or no. if you can not answer with no only";
 
-        //    var request = new GenerateContentRequest(prompt);
+            var request = new GenerateContentRequest(prompt);
 
-        //    // save the image in the folder
+            // save the image in the folder
 
-        //    var filePath = Path.Combine("wwwroot", "images", "image.png");
-        //    await System.IO.File.WriteAllBytesAsync(filePath, content);
+            var filePath = Path.Combine("wwwroot", "images", "image.png");
+            await System.IO.File.WriteAllBytesAsync(filePath, content);
 
-        //    if (!System.IO.File.Exists(filePath))
-        //        return false;
+            if (!System.IO.File.Exists(filePath))
+                return false;
 
-        //    await request.AddMedia("http://localhost:5093/images/image.png");
+            await request.AddMedia("http://localhost:5093/images/image.png");
 
-        //    int retries = 3;
-        //    while (retries > 0)
-        //    {
-        //        try
-        //        {
-        //            var response = await model.GenerateContent(request);
-        //            string answer = response.Text.Substring(0, 3).ToLower();
+            int retries = 3;
+            while (retries > 0)
+            {
+                try
+                {
+                    var response = await model.GenerateContent(request);
+                    string answer = response.Text.Substring(0, 3).ToLower();
 
-        //            // Delete the image
-        //            if (System.IO.File.Exists(filePath))
-        //            {
-        //                System.IO.File.Delete(filePath);
-        //            }
+                    // Delete the image
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        System.IO.File.Delete(filePath);
+                    }
 
-        //            return answer.Contains("yes");
-        //        }
-        //        catch (Exception ex)
-        //        {
-        //            if (retries == 0 || !ex.Message.Contains("overloaded"))
-        //            {
-        //                // Log the error or handle the exception
-        //                return false;
-        //            }
+                    return answer.Contains("yes");
+                }
+                catch (Exception ex)
+                {
+                    if (retries == 0 || !ex.Message.Contains("overloaded"))
+                    {
+                        // Log the error or handle the exception
+                        return false;
+                    }
 
-        //            retries--;
-        //            await Task.Delay(TimeSpan.FromSeconds(5 * (3 - retries)));  // Exponential backoff
-        //        }
-        //    }
+                    retries--;
+                    await Task.Delay(TimeSpan.FromSeconds(5 * (3 - retries)));  // Exponential backoff
+                }
+            }
 
-        //    // Delete the image if the request failed
-        //    if (System.IO.File.Exists(filePath))
-        //    {
-        //        System.IO.File.Delete(filePath);
-        //    }
+            // Delete the image if the request failed
+            if (System.IO.File.Exists(filePath))
+            {
+                System.IO.File.Delete(filePath);
+            }
 
-        //    return false;
-        //}
+            return false;
+        }
 
     }
 }
