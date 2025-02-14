@@ -49,10 +49,10 @@ namespace gp_backend.Api.Controllers
 
                 var fileDescription = GetDescription(file);
 
-                //if(!(await checkInjury(fileDescription.Content.Content)))
-                //{
-                //    return Ok(new BaseResponse(true, ["You are health"], null));
-                //}
+                if (!(await checkInjury(fileDescription.Content.Content)))
+                {
+                    return Ok(new BaseResponse(true, ["You are health"], null));
+                }
 
                 var response = await CallFlaskEndPoint(file, "type");
                 string mask = await GetTheMask(file);
@@ -198,10 +198,10 @@ namespace gp_backend.Api.Controllers
 
                 var fileDescription = GetDescription(file);
 
-                //if (!(await checkInjury(fileDescription.Content.Content)))
-                //{
-                //    return Ok(new BaseResponse(true, ["You are health"], null));
-                //}
+                if (!(await checkInjury(fileDescription.Content.Content)))
+                {
+                    return Ok(new BaseResponse(true, ["You are health"], null));
+                }
 
                 var response = await CallFlaskEndPoint(file, "skin");
                 string mask = await GetTheMask(file);
